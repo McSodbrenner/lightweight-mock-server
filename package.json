@@ -1,18 +1,18 @@
 {
   "name": "lightweight-mock-server",
-  "version": "0.8.0",
+  "version": "0.8.3",
   "description": "A lightweight and simple but flexible mock server.",
   "main": "index.js",
-  "type": "module",
   "bin": {
-    "lightweight-mock-server": "./index.js"
+    "lightweight-mock-server": "./cli.sh"
   },
   "scripts": {
-    "start": "nodemon",
-    "example": "nodemon lightweight-mock-server --entrypoint=./example/api.js"
+    "start": "nodemon index.js --entrypoint=./example/api.js",
+    "build": "node index.js --entrypoint=./example/api.js --build"
   },
   "author": "Christoph Erdmann",
   "license": "ISC",
+  "repository": "github:McSodbrenner/lightweight-mock-server",
   "dependencies": {
     "axios": "^0.22.0",
     "bare-css": "^2.0.3",

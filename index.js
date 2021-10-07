@@ -1,17 +1,16 @@
 #!/usr/bin/node
-import path from 'path'
-import fs from 'fs'
-import express from 'express'
-import session from 'express-session'
-import cookieParser from 'cookie-parser'
-import cors from 'cors'
-import faker from 'faker'
-import marked from 'marked'
-import axios from 'axios'
-import initConvenienceRoutes from './lib/convenienceRoutes.js'
-import highlightjs from 'highlight.js'
-import { Command } from 'commander/esm.mjs'
-
+const path = require('path')
+const fs = require('fs')
+const express = require('express')
+const session = require('express-session')
+const cookieParser = require('cookie-parser')
+const cors = require('cors')
+const faker = require('faker')
+const marked = require('marked')
+const axios = require('axios')
+const initConvenienceRoutes = require('./lib/convenienceRoutes')
+const highlightjs = require('highlight.js')
+const { Command } = require('commander')
 
 // ---------- handle CLI parameters
 const program = new Command()
@@ -24,9 +23,6 @@ program
 program.parse(process.argv)
 const args = program.opts()
 args.datapath = path.dirname(args.entrypoint)
-const __dirname = path.join('/', path.dirname(import.meta.url.substr(8)))
-
-process.chdir(args.datapath)
 
 function log(msg) {
 	const date = new Date()
@@ -36,8 +32,8 @@ function log(msg) {
 // ---------- init environment
 // extend the response object
 express.response.sendMarkdown = function(filepath) {
-	const css = fs.readFileSync(path.join(__dirname, 'node_modules/bare-css/css/bare.min.css')).toString()
-	const css2 = fs.readFileSync(path.join(__dirname, 'node_modules/highlight.js/styles/atom-one-light.css')).toString()
+	const css = fs.readFileSync(require.resolve('bare-css/css/bare.min.css')).toString()
+	const css2 = fs.readFileSync(require.resolve('highlight.js/styles/atom-one-light.css')).toString()
 	const content = marked(fs.readFileSync(filepath).toString(), {
 		highlight: function(code, lang) {
 			const language = highlightjs.getLanguage(lang) ? lang : 'plaintext'
@@ -68,7 +64,6 @@ const env = {
 	session,
 	faker,
 	saveRoute,
-	__dirname: path.join(__dirname, args.datapath)
 }
 
 // ---------- init express and all middlewares
@@ -90,8 +85,14 @@ app.use('*', (req, res, next) => {
 })
 
 // ---------- integration of convenience and user routes
-const initUserRoutes = (await import(args.entrypoint)).default
-initUserRoutes(app, env)
+if (fs.existsSync(args.entrypoint)) {
+	const cwd = process.cwd();
+	process.chdir(args.datapath)
+	const initUserRoutes = require(path.join(cwd, args.entrypoint)).default
+	initUserRoutes(app, env)
+} else {
+	log(`Entrypoint file (${args.entrypoint}) does not exist and thus is ignored.`);
+}
 initConvenienceRoutes(app, env)
 
 // ---------- default routes
@@ -115,7 +116,7 @@ const server = app.listen(args.port, () => {
 
 if (args.build) {
 	(async function(){
-		const buildUserRoutes = (await import(args.entrypoint)).build
+		const buildUserRoutes = require(path.join(cwd, args.entrypoint)).build
 		axios.all(buildUserRoutes(app, env)).then(() => {
 			server.close();
 		})

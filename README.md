@@ -10,7 +10,9 @@ Install it as local dependency for your project:
 `$ npm install lightweight-mock-server`
 
 Start the server:  
-`$ npx nodemon lightweight-mock-server`
+`$ npx lightweight-mock-server`  
+or better (to automatically restart the server on changes of your api.js file)  
+`$ npx nodemon --exec npx lightweight-mock-server`
 
 View this README at: http://localhost:3030/-
 
@@ -19,7 +21,7 @@ View this README at: http://localhost:3030/-
 ## Configuration
 
 You can pass some arguments the behaviour of lightweight-mock-server. For example pass the port if you want a port different from 3030.  
-`$ npx nodemon lightweight-mock-server --port=3000`
+`$ npx lightweight-mock-server --port=3000`
 
 See all parameters via:  
 `$ npx lightweight-mock-server --help`
@@ -29,7 +31,7 @@ See all parameters via:
 ## Create your own mock environment
 
 You have to create a file an entrypoint file (default: `./mock-data/api.js`) for your mock definitions.
-This ES6 file has to export a function and gets two parameters passed:
+This file has to export a default function and gets two parameters passed:
 
 | Parameter | Description
 |-----------|------------
@@ -39,14 +41,13 @@ This ES6 file has to export a function and gets two parameters passed:
 | *env*.express | The [Express](http://expressjs.com/) object. Useful to instantiate an Router object.
 | *env*.session | An [express-session](https://www.npmjs.com/package/express-session) object to be able to handle use login/logout functionality.
 | *env*.faker | A [faker](http://marak.github.io/faker.js/) instance to be able to use fake data.
-| *env*.__dirname | As we use ES6 syntax __dirname is usually not available. But it is faked to be able to send a file as response.
 
 ---
 
-## Commented example  
+### Commented example  
 
 ```js
-export default function(app, env) {
+const api = function(app, env) {
 	// if you want all your routes to be available via /api/* use this,
 	// otherwise you would have to use app.* instead of router.* for all route definitions
 	const router = env.express.Router()
@@ -68,7 +69,7 @@ export default function(app, env) {
 	// if your response doesn't have to be dynamic you can also just return a file you've prepared
 	// endpoint available via /api/colors
 	router.get('/colors', (req, res) => {
-		res.sendFile('colors.json', { root: env.__dirname })
+		res.sendFile('colors.json', { root: __dirname })
 	})    
 
 	// faker is already included
@@ -92,12 +93,16 @@ export default function(app, env) {
 			res.send('logged out')
 		}
 	})
-}     
+}
+
+module.exports = {
+	default: api,
+}
 ```
 
 ---
 
-## Convenience functions
+## Convenience routes
 
 All routes starting with `/-/` are endpoints with convenience functionality.
 
@@ -125,12 +130,17 @@ For this to work you have to export a function named `build` from your entrypoin
 ### Example
 
 ```js
-export function build(_app, env) {
+const build = function(_app, env) {
 	return [
 		env.saveRoute('get', ['/'], 'dist/api/README.htm'),
-		env.saveRoute('get', ['/colors'], 'dist/api/colors'),
+		env.saveRoute('get', ['/api/colors'], 'dist/api/colors'),
 		env.saveRoute('get', ['/api/faker'], 'dist/api/faker'),
 	]
+}
+
+module.exports = {
+	default: api,
+	build,
 }
 ```
 

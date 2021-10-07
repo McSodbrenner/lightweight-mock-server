@@ -1,4 +1,4 @@
-export default function(app, env) {
+const api = function(app, env) {
 	// if you want all your routes to be available via /api/* use this,
 	// otherwise you would have to use app.* instead of router.* for all route definitions
 	const router = env.express.Router()
@@ -45,10 +45,16 @@ export default function(app, env) {
 	})
 }
 
-export function build(_app, env) {
+const build = function(_app, env) {
 	return [
 		env.saveRoute('get', ['/'], '../../mock-data-static/api/README.htm'),
 		env.saveRoute('get', ['/api/colors'], '../../mock-data-static/api/colors'),
 		env.saveRoute('get', ['/api/faker'], '../../mock-data-static/api/faker'),
 	]
 }
+
+module.exports = {
+	default: api,
+	build,
+}
+
