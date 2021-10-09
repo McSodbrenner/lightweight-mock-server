@@ -18,7 +18,7 @@ const program = new Command()
 program
   .option('-b, --build', 'Build a static representation of the mock definitions.')
   .option('-p, --port <port>', 'Port of the mock server.', 3030)
-  .option('-e, --entrypoint <path>', 'path to the entrypoint file (your api definitions).', './mock-data/api.js')
+  .option('-e, --entrypoint <path>', 'Path to the entrypoint file with your API definitions.', './mock-data/api.js')
 
 program.parse(process.argv)
 const args = program.opts()
