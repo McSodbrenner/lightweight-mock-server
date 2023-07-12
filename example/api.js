@@ -19,27 +19,27 @@ const api = function(app, env) {
 	// if your response doesn't have to be dynamic you can also just return a file you've prepared
 	// endpoint available via /api/colors
 	router.get('/colors', (req, res) => {
-		res.sendFile('colors.json', { root: env.__dirname })
+		res.sendFile('colors.json', { root: env.data })
 	})    
 
 	// faker is already included
-	// endpoint available via /api/faker
-	router.get('/faker', (req, res) => {
-		res.json({ name: env.faker.helpers.createCard() })
+	// endpoint available via /api/fake
+	router.get('/fake', (req, res) => {
+		res.json({ name: env.falso.randFullName() })
 	})    
 
 	// session handling is already included (useful to fake a simple login system)
 	// endpoint available via /api/user
 	router.get('/user', (req, res) => {
 		if (!req.query.action) {
-			res.send('logged in: ' + (req.session.loggedin ? 'true' : 'false'))
+			res.send('logged in: ' + (env.session.loggedin ? 'true' : 'false'))
 		}
 		else if (req.query.action === 'login') {
-			req.session.loggedin = true
+			env.session.loggedin = true
 			res.send('logged in')
 		}
 		else if (req.query.action === 'logout') {
-			req.session.loggedin = false
+			env.session.loggedin = false
 			res.send('logged out')
 		}
 	})
@@ -53,8 +53,8 @@ const build = function(_app, env) {
 	]
 }
 
-module.exports = {
-	default: api,
+export {
+	api as default,
 	build,
-}
+};
 

@@ -2,31 +2,32 @@
   "name": "lightweight-mock-server",
   "version": "0.8.5",
   "description": "A lightweight and simple but flexible mock server.",
+  "type": "module",
   "main": "index.js",
   "bin": {
     "lightweight-mock-server": "./cli.sh"
   },
   "scripts": {
     "start": "nodemon index.js --entrypoint=./example/api.js",
-    "build": "node index.js --entrypoint=./example/api.js --build"
+    "build": "node index.js --entrypoint=./example/api.js --build",
+    "narf": "nodemon index.js --entrypoint=../../homer/mock/narfstudios_homer/index.js"
   },
   "author": "Christoph Erdmann",
   "license": "ISC",
   "repository": "github:McSodbrenner/lightweight-mock-server",
   "dependencies": {
-    "axios": "^0.22.0",
+    "axios": "^1.4.0",
     "bare-css": "^2.0.3",
-    "commander": "^8.2.0",
-    "cookie-parser": "^1.4.5",
+    "commander": "^11.0.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "express-session": "^1.17.2",
-    "faker": "^5.5.3",
-    "highlight.js": "^11.2.0",
-    "marked": "^4.0.10",
-    "nodemon": "^2.0.13"
+    "express-session": "^1.17.3",
+    "highlight.js": "^11.8.0",
+    "marked": "^5.1.1",
+    "nodemon": "^3.0.1"
   },
   "engines": {
-    "node": ">=13.2.0"
+    "node": ">=18.16.0"
   }
 }

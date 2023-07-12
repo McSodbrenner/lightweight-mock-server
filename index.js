@@ -1,16 +1,16 @@
 #!/usr/bin/node
-const path = require('path')
-const fs = require('fs')
-const express = require('express')
-const session = require('express-session')
-const cookieParser = require('cookie-parser')
-const cors = require('cors')
-const faker = require('faker')
-const marked = require('marked')
-const axios = require('axios')
-const initConvenienceRoutes = require('./lib/convenienceRoutes')
-const highlightjs = require('highlight.js')
-const { Command } = require('commander')
+import path from 'node:path';
+import fs from 'node:fs';
+import url from 'url';
+import express from 'express';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import { marked } from 'marked';
+import axios from 'axios';
+import initConvenienceRoutes from './lib/convenienceRoutes.js';
+import highlightjs from 'highlight.js';
+import { Command } from 'commander';
 
 // ---------- handle CLI parameters
 const program = new Command()
@@ -22,25 +22,25 @@ program
 
 program.parse(process.argv)
 const args = program.opts()
-args.datapath = path.dirname(args.entrypoint)
+const root = path.dirname(url.fileURLToPath(import.meta.url));
+const data = path.resolve(path.dirname(args.entrypoint));
 
 function log(msg) {
-	const date = new Date()
-	console.log(`[${date.toTimeString()}:] ${msg}`)
+	console.log(`[${new Date().toLocaleTimeString()}] ${msg}`)
 }
 
 // ---------- init environment
 // extend the response object
 express.response.sendMarkdown = function(filepath) {
-	const css = fs.readFileSync(require.resolve('bare-css/css/bare.min.css')).toString()
-	const css2 = fs.readFileSync(require.resolve('highlight.js/styles/atom-one-light.css')).toString()
-	const content = marked(fs.readFileSync(filepath).toString(), {
+	const cssBare			= fs.readFileSync('../node_modules/bare-css/css/bare.min.css').toString()
+	const cssHighlightJs	= fs.readFileSync('../node_modules/highlight.js/styles/atom-one-light.css').toString()
+	const content			= marked.parse(fs.readFileSync(filepath).toString(), {
 		highlight: function(code, lang) {
 			const language = highlightjs.getLanguage(lang) ? lang : 'plaintext'
 			return highlightjs.highlight(code, { language }).value
 		}
 	})
-	const html = `<section>${content}</section><style>${css}${css2}</style>`
+	const html = `<section>${content}</section><style>${cssBare}${cssHighlightJs}</style>`
 	this.send(html)
 }
 
@@ -58,11 +58,12 @@ const saveRoute = function(axiosMethod, axiosParams, filepath) {
 axios.defaults.responseType = 'arraybuffer'
 
 const env = {
+	root,
+	data,
 	args,
 	express,
 	axios,
 	session,
-	faker,
 	saveRoute,
 }
 
@@ -80,15 +81,15 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 app.use(cookieParser())
 // show current request in console
 app.use('*', (req, res, next) => {
-	log('< ' + 'http://localhost' + req.originalUrl)
+	// console.log("###", req.originalUrl);
+	log('< ' + `${req.method} ${req.protocol}://${req.hostname}:${args.port}` + req.originalUrl)
 	next()
 })
 
 // ---------- integration of convenience and user routes
 if (fs.existsSync(args.entrypoint)) {
-	const cwd = process.cwd();
-	process.chdir(args.datapath)
-	const initUserRoutes = require(path.join(cwd, args.entrypoint)).default
+	process.chdir(path.dirname(args.entrypoint))
+	const initUserRoutes = (await import(path.join(env.root, args.entrypoint))).default;
 	initUserRoutes(app, env)
 } else {
 	log(`Entrypoint file (${args.entrypoint}) does not exist and thus is ignored.`);
@@ -100,7 +101,7 @@ initConvenienceRoutes(app, env)
 
 // favicon.ico handling
 app.get('/favicon.ico', (req, res) => {
-	res.sendFile('favicon.ico', { root: __dirname })
+	res.sendFile('favicon.ico', { root })
 })
 
 // 404 handling for non existing routes
