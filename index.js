@@ -15,8 +15,6 @@ import { Command } from 'commander';
 // ---------- handle CLI parameters
 const program = new Command()
 
-console.log("###", process.cwd());
-
 program
   .option('-b, --build', 'Build a static representation of the mock definitions.')
   .option('-p, --port <port>', 'Port of the mock server.', 3030)
@@ -27,8 +25,6 @@ const args = program.opts()
 const cwd = process.cwd();
 const root = path.dirname(url.fileURLToPath(import.meta.url));
 const data = path.resolve(path.join(cwd, path.dirname(args.entrypoint)));
-
-console.log("###", { cwd, root, data });
 
 function log(msg) {
 	console.log(`[${new Date().toLocaleTimeString()}] ${msg}`)
