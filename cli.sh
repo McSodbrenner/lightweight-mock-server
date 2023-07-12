@@ -1,2 +1,2 @@
-#!/bin/bash
-$(npm bin)/../lightweight-mock-server/index.js $@
+#!/usr/bin/env sh
+node "$(dirname "$0")/../lightweight-mock-server/index.js" "$@"

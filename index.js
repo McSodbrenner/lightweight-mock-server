@@ -15,6 +15,8 @@ import { Command } from 'commander';
 // ---------- handle CLI parameters
 const program = new Command()
 
+console.log("###", process.cwd());
+
 program
   .option('-b, --build', 'Build a static representation of the mock definitions.')
   .option('-p, --port <port>', 'Port of the mock server.', 3030)
@@ -22,8 +24,11 @@ program
 
 program.parse(process.argv)
 const args = program.opts()
+const cwd = process.cwd();
 const root = path.dirname(url.fileURLToPath(import.meta.url));
-const data = path.resolve(path.dirname(args.entrypoint));
+const data = path.resolve(path.join(cwd, path.dirname(args.entrypoint)));
+
+console.log("###", { cwd, root, data });
 
 function log(msg) {
 	console.log(`[${new Date().toLocaleTimeString()}] ${msg}`)
@@ -58,6 +63,7 @@ const saveRoute = function(axiosMethod, axiosParams, filepath) {
 axios.defaults.responseType = 'arraybuffer'
 
 const env = {
+	cwd,
 	root,
 	data,
 	args,
@@ -89,7 +95,7 @@ app.use('*', (req, res, next) => {
 // ---------- integration of convenience and user routes
 if (fs.existsSync(args.entrypoint)) {
 	process.chdir(path.dirname(args.entrypoint))
-	const initUserRoutes = (await import(path.join(env.root, args.entrypoint))).default;
+	const initUserRoutes = (await import(path.join(env.cwd, args.entrypoint))).default;
 	initUserRoutes(app, env)
 } else {
 	log(`Entrypoint file (${args.entrypoint}) does not exist and thus is ignored.`);

@@ -9,8 +9,7 @@
   },
   "scripts": {
     "start": "nodemon index.js --entrypoint=./example/api.js",
-    "build": "node index.js --entrypoint=./example/api.js --build",
-    "narf": "nodemon index.js --entrypoint=../../homer/mock/narfstudios_homer/index.js"
+    "build": "node index.js --entrypoint=./example/api.js --build"
   },
   "author": "Christoph Erdmann",
   "license": "ISC",
