@@ -1,15 +1,14 @@
 #!/usr/bin/node
-import path from 'node:path';
 import fs from 'node:fs';
+import path from 'node:path';
 import url from 'url';
 import express from 'express';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import { marked } from 'marked';
 import axios from 'axios';
 import initConvenienceRoutes from './lib/convenienceRoutes.js';
-import highlightjs from 'highlight.js';
+import templateEngineMarkdown from './lib/templateEngineMarkdown.js';
 import { Command } from 'commander';
 
 // ---------- handle CLI parameters
@@ -31,20 +30,6 @@ function log(msg) {
 }
 
 // ---------- init environment
-// extend the response object
-express.response.sendMarkdown = function(filepath) {
-	const cssBare			= fs.readFileSync('../node_modules/bare-css/css/bare.min.css').toString()
-	const cssHighlightJs	= fs.readFileSync('../node_modules/highlight.js/styles/atom-one-light.css').toString()
-	const content			= marked.parse(fs.readFileSync(filepath).toString(), {
-		highlight: function(code, lang) {
-			const language = highlightjs.getLanguage(lang) ? lang : 'plaintext'
-			return highlightjs.highlight(code, { language }).value
-		}
-	})
-	const html = `<section>${content}</section><style>${cssBare}${cssHighlightJs}</style>`
-	this.send(html)
-}
-
 const saveRoute = function(axiosMethod, axiosParams, filepath) {
 	axiosParams[0] = new URL(axiosParams[0], `http://localhost:${args.port}`).href;
 	return axios[axiosMethod].apply(this, axiosParams).then(function(response) {
@@ -60,7 +45,6 @@ axios.defaults.responseType = 'arraybuffer'
 
 const env = {
 	cwd,
-	root,
 	data,
 	args,
 	express,
@@ -71,6 +55,11 @@ const env = {
 
 // ---------- init express and all middlewares
 const app = express()
+
+app.engine('md', templateEngineMarkdown(env));
+app.set('views', '.')
+app.set('view engine', 'md')
+
 app.use(cors())
 app.use(session({
 	secret: 'mock-server',
@@ -81,9 +70,9 @@ app.use(session({
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(cookieParser())
+
 // show current request in console
 app.use('*', (req, res, next) => {
-	// console.log("###", req.originalUrl);
 	log('< ' + `${req.method} ${req.protocol}://${req.hostname}:${args.port}` + req.originalUrl)
 	next()
 })

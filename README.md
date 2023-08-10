@@ -45,7 +45,6 @@ This file has to export a default function and gets two parameters passed:
 |-----------|------------
 | **app** | A standard "Express" app object you can use to define your routes and your API functionality.
 | **env** | An object with some variables and helpers.
-| *env*.root | The path to the mock library root.
 | *env*.data | The path to the entrypoint dir.
 | *env*.args | The arguments which were passed to the CLI command.
 | *env*.express | The [Express](http://expressjs.com/) object. Useful to instantiate a Router object.
@@ -72,8 +71,14 @@ const api = function(app, env) {
 	// the command "sendMarkdown" is an extension for the response object by lightweight-mock-server
 	// endpoint available via /api
 	app.get('/', (req, res) => {
-		res.sendMarkdown('README.md')
+		res.render('README.md')
 	})    
+
+	// simple response of json data
+	// endpoint available via /api/json
+	router.get('/json', (req, res) => {
+		res.json(env)
+	}) 
 
 	// if your response doesn't have to be dynamic you can also just return a file you've prepared
 	// endpoint available via /api/colors
@@ -81,24 +86,21 @@ const api = function(app, env) {
 		res.sendFile('colors.json', { root: env.data })
 	})    
 
-	// faker is already included
-	// endpoint available via /api/fake
-	router.get('/fake', (req, res) => {
-		res.json({ name: env.falso.randFullName() })
-	})    
-
 	// session handling is already included (useful to fake a simple login system)
-	// endpoint available via /api/user
+	// endpoint available via 
+	// /api/user
+	// /api/user?action=login
+	// /api/user?action=logout
 	router.get('/user', (req, res) => {
 		if (!req.query.action) {
-			res.send('logged in: ' + (req.session.loggedin ? 'true' : 'false'))
+			res.send('logged in: ' + (env.session.loggedin ? 'true' : 'false'))
 		}
 		else if (req.query.action === 'login') {
-			req.session.loggedin = true
+			env.session.loggedin = true
 			res.send('logged in')
 		}
 		else if (req.query.action === 'logout') {
-			req.session.loggedin = false
+			env.session.loggedin = false
 			res.send('logged out')
 		}
 	})
@@ -110,7 +112,7 @@ export {
 ```
 
 
-## Convenience routes
+## Convenience
 
 All routes starting with `/-/` are endpoints with convenience functionality.
 
@@ -121,11 +123,13 @@ All routes starting with `/-/` are endpoints with convenience functionality.
 | `/-/500`<br />`/-/404`<br />`/-/403`<br />`/-/xxx` | Returns the HTTP error message with the corresponding HTTP status code. |
 | `/-/mirror` | Returns a JSON object with several data you can use to analyze your request. |
 
-The response (`res`) object was extended with the following methods:
+In addition, a template engine was registered, which renders Markdown files desirably. So Markdown will be rendered by [marked](https://marked.js.org/) and styled by [bare.css](https://barecss.com/).
 
-| Method | Description |
-|-----------|-----------|
-| `res.sendMarkdown(FILEPATH)` | Sends a nicely rendered Markdown file as response. It will be rendered by [marked](https://marked.js.org/) and styled by [bare.css](https://barecss.com/). |
+```js
+app.get('/', (req, res) => {
+	res.render('README.md')
+}) 
+```
 
 
 ## Static build generation

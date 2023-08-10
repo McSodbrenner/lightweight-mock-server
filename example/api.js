@@ -13,8 +13,14 @@ const api = function(app, env) {
 	// the command "sendMarkdown" is an extension for the response object by lightweight-mock-server
 	// endpoint available via /api
 	app.get('/', (req, res) => {
-		res.sendMarkdown('README.md')
+		res.render('README.md')
 	})    
+
+	// simple response of json data
+	// endpoint available via /api/json
+	router.get('/json', (req, res) => {
+		res.json(env)
+	}) 
 
 	// if your response doesn't have to be dynamic you can also just return a file you've prepared
 	// endpoint available via /api/colors
@@ -22,14 +28,11 @@ const api = function(app, env) {
 		res.sendFile('colors.json', { root: env.data })
 	})    
 
-	// faker is already included
-	// endpoint available via /api/fake
-	router.get('/fake', (req, res) => {
-		res.json({ name: env.falso.randFullName() })
-	})    
-
 	// session handling is already included (useful to fake a simple login system)
-	// endpoint available via /api/user
+	// endpoint available via 
+	// /api/user
+	// /api/user?action=login
+	// /api/user?action=logout
 	router.get('/user', (req, res) => {
 		if (!req.query.action) {
 			res.send('logged in: ' + (env.session.loggedin ? 'true' : 'false'))
