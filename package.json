@@ -1,6 +1,6 @@
 {
   "name": "lightweight-mock-server",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "A lightweight and simple but flexible mock server.",
   "type": "module",
   "main": "index.js",
@@ -8,8 +8,8 @@
     "lightweight-mock-server": "./cli.sh"
   },
   "scripts": {
-    "start": "nodemon index.js --entrypoint=./example/api.js --port 3031",
-    "build": "node index.js --entrypoint=./example/api.js --build"
+    "start": "nodemon index.js --entrypoint=./example/api.js --port 3030",
+    "build": "node index.js --entrypoint=./example/api.js  --port 3030 --build"
   },
   "author": "Christoph Erdmann",
   "license": "ISC",
