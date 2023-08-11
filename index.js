@@ -73,6 +73,9 @@ app.use(cookieParser())
 
 // show current request in console
 app.use('*', (req, res, next) => {
+	env.url = {
+		root: `${req.protocol}://${req.hostname}:${args.port}`,
+	};
 	log('< ' + `${req.method} ${req.protocol}://${req.hostname}:${args.port}` + req.originalUrl)
 	next()
 })

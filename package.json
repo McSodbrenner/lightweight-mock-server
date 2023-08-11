@@ -1,6 +1,6 @@
 {
   "name": "lightweight-mock-server",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "A lightweight and simple but flexible mock server.",
   "type": "module",
   "main": "index.js",
