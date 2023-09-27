@@ -65,7 +65,7 @@ app.use(session({
 	secret: 'mock-server',
 	resave: false,
 	saveUninitialized: false,
-	cookie: { maxAge: 60000 },
+	cookie: { maxAge: 1000 * 60 * 60 * 24 },
 }))
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
