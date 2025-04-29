@@ -67,7 +67,7 @@ app.use(session({
 	saveUninitialized: false,
 	cookie: { maxAge: 1000 * 60 * 60 * 24 },
 }))
-app.use(express.json()) // for parsing application/json
+app.use(express.json({ limit: "50MB" })); // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(cookieParser())
 
