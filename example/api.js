@@ -1,20 +1,20 @@
 const api = function(app, env) {
-	// if you want all your routes to be available via /api/* use this,
-	// otherwise you would have to use app.* instead of router.* for all route definitions
-	const router = env.express.Router()
-	app.use('/api', router)
-	
-	// a simple possibility to delay all requests to simulate a slow network
-	router.use((req, res, next) => {
-		setTimeout(next, env.args.build ? 0 : 1000)
-	})
-
 	// an example which renders your README.md with the docs for your API
 	// the command "sendMarkdown" is an extension for the response object by lightweight-mock-server
 	// endpoint available via /api
 	app.get('/', (req, res) => {
 		res.render('README.md')
 	})    
+
+	// if you want all your routes to be available via /api/* use this,
+	// otherwise you would have to use app.* instead of router.* for all route definitions
+	const router = env.express.Router()
+	app.use('/api', router)
+
+	// a simple possibility to delay all requests to simulate a slow network
+	router.use((req, res, next) => {
+		setTimeout(next, env.args.build ? 0 : 1000)
+	})
 
 	// simple response of json data
 	// endpoint available via /api/json

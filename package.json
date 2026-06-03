@@ -15,17 +15,17 @@
   "license": "ISC",
   "repository": "github:McSodbrenner/lightweight-mock-server",
   "dependencies": {
-    "axios": "^1.4.0",
+    "axios": "^1.17.0",
     "bare-css": "^2.0.3",
-    "commander": "^11.0.0",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "express-session": "^1.17.3",
-    "highlight.js": "^11.8.0",
-    "marked": "^7.0.2",
-    "marked-highlight": "^2.0.4",
-    "nodemon": "^3.0.1"
+    "commander": "^15.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "highlight.js": "^11.11.1",
+    "marked": "^18.0.4",
+    "marked-highlight": "^2.2.4",
+    "nodemon": "^3.1.14"
   },
   "engines": {
     "node": ">=18.16.0"

@@ -72,7 +72,7 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 app.use(cookieParser())
 
 // show current request in console
-app.use('*', (req, res, next) => {
+app.use((req, res, next) => {
 	log('< ' + `${req.method} ${req.protocol}://${req.hostname}:${args.port}` + req.originalUrl)
 	next()
 })
@@ -96,7 +96,7 @@ app.get('/favicon.ico', (req, res) => {
 })
 
 // 404 handling for non existing routes
-app.get('*', (req, res) => {
+app.get('/{*splat}', (req, res) => {
 	res.status(404)
 	res.send('Route not defined')
 })
